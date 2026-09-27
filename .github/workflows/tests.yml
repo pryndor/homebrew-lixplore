@@ -1,0 +1,33 @@
+name: Test formula
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Install from source
+        run: brew install --build-from-source --verbose pryndor/lixplore/lixplore-cli
+
+      - name: brew test
+        run: brew test --verbose pryndor/lixplore/lixplore-cli
+
+      - name: brew audit
+        run: brew audit --strict --online pryndor/lixplore/lixplore-cli
+
+      - name: Smoke test
+        run: |
+          lixplore --help
+          lixplore --check-tui
+          lixplore -x -q "neural networks" -m 2
