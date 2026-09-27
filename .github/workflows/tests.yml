@@ -13,6 +13,10 @@ jobs:
       matrix:
         os: [macos-latest, macos-15-intel, ubuntu-latest]
     runs-on: ${{ matrix.os }}
+    # Intel Macs get no Homebrew bottles, so Python and numpy build from
+    # source there and can take hours; report it but don't fail the run.
+    continue-on-error: ${{ matrix.os == 'macos-15-intel' }}
+    timeout-minutes: ${{ matrix.os == 'macos-15-intel' && 90 || 30 }}
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@main
